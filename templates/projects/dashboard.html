@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-text">Todo</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="{% url 'dashboard' %}" class="nav-item active">Dashboard</a>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="main-inner main-wide">
+      <h1>Dashboard</h1>
+    </div>
+  </main>
+</div>
+{% endblock %}
