@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block body %}
+<div class="app">
+  <main class="main">
+    <h1>{{ project.name }}</h1>
+    <div class="task-list" id="taskList">
+      {% for task in tasks %}
+      <div class="task-item">{{ task.title }}</div>
+      {% endfor %}
+    </div>
+  </main>
+</div>
+{% endblock %}
