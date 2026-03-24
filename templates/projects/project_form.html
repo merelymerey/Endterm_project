@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+  <div class="auth-card" style="max-width: 480px">
+    <div class="auth-logo">
+      <h1 class="auth-title">{{ title }}</h1>
+    </div>
+
+    <form method="post" class="auth-form" novalidate>
+      {% csrf_token %}
+
+      {% if form.errors %}
+      <div class="form-error-box">
+        {% for field, errors in form.errors.items %}
+          {% for error in errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="id_name">Project Name</label>
+        {{ form.name }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="id_description">Description</label>
+        {{ form.description }}
+      </div>
+
+      <div class="form-actions">
+        <a href="{% if project %}{% url 'project_detail' project.pk %}{% else %}{% url 'dashboard' %}{% endif %}" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
