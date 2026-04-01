@@ -55,3 +55,57 @@ class RegisterForm(forms.Form):
         if p1 and len(p1) < 6:
             raise forms.ValidationError('Password must be at least 6 characters.')
         return cleaned
+
+
+
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Enter your email',
+            'autocomplete': 'off',
+        })
+    )
+
+
+class VerifyResetCodeForm(forms.Form):
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': '000000',
+            'autocomplete': 'off',
+            'maxlength': '6',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]*',
+            'style': 'text-align:center;font-size:1.8rem;font-weight:700;letter-spacing:0.3em;',
+        })
+    )
+
+
+class ResetPasswordForm(forms.Form):
+    password1 = forms.CharField(
+        label='New password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'New password',
+        })
+    )
+    password2 = forms.CharField(
+        label='Confirm password',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Confirm new password',
+        })
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        p1 = cleaned.get('password1')
+        p2 = cleaned.get('password2')
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError('Passwords do not match.')
+        if p1 and len(p1) < 6:
+            raise forms.ValidationError('Password must be at least 6 characters.')
+        return cleaned
