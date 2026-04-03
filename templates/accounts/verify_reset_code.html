@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Verify Code{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <svg width="40" height="40" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="14" fill="var(--accent)"/>
+        <path d="M6 10L14 15L22 10M6 10V18H22V10" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      <h1 class="auth-title">Check your email</h1>
+      <p class="auth-subtitle">We sent a 6-digit code to <strong>{{ email }}</strong></p>
+    </div>
+
+    <form method="post" class="auth-form" novalidate>
+      {% csrf_token %}
+
+      {% if error %}
+      <div class="form-error-box">
+        <p>{{ error }}</p>
+      </div>
+      {% endif %}
+
+      {% if form.errors %}
+      <div class="form-error-box">
+        {% for field, errors in form.errors.items %}
+          {% for e in errors %}
+            <p>{{ e }}</p>
+          {% endfor %}
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="id_code">Verification code</label>
+        {{ form.code }}
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full">Verify</button>
+    </form>
+
+    <p class="auth-footer">
+      Didn't receive the code? <a href="{% url 'resend_reset_code' %}" class="auth-link">Resend</a>
+    </p>
+    <p class="auth-footer" style="margin-top:8px">
+      <a href="{% url 'forgot_password' %}" class="auth-link">Try a different email</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
