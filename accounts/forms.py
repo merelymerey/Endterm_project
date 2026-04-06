@@ -109,3 +109,29 @@ class ResetPasswordForm(forms.Form):
         if p1 and len(p1) < 6:
             raise forms.ValidationError('Password must be at least 6 characters.')
         return cleaned
+
+
+class VerifyEmailCodeForm(forms.Form):
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': '000000',
+            'autocomplete': 'off',
+            'maxlength': '6',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]*',
+            'style': 'text-align:center;font-size:1.8rem;font-weight:700;letter-spacing:0.3em;',
+        })
+    )
+
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-input'
+        self.fields['username'].label = 'Email or Username'
+        self.fields['username'].widget.attrs['placeholder'] = 'Email or Username'
+        self.fields['password'].widget.attrs['placeholder'] = 'Password'
