@@ -1,0 +1,32 @@
+services:
+  web:
+    build: .
+    container_name: todo-claude
+    restart: unless-stopped
+    environment:
+      DB_NAME: todo_claude
+      DB_USER: admin
+      DB_PASSWORD: Pg9kXm2pRfLn7qYs4vBj
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DJANGO_SETTINGS_MODULE: config.settings
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.todo.rule=Host(`todo.infonixcloud.asia`)"
+      - "traefik.http.routers.todo.entrypoints=web"
+      - "traefik.http.services.todo.loadbalancer.server.port=8000"
+    networks:
+      - web
+      - infra
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+
+networks:
+  web:
+    external: true
+  infra:
+    external: true
