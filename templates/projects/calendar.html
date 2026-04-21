@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Calendar{% endblock %}
+
+{% block body %}
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="14" fill="var(--accent)"/>
+          <path d="M9 14.5L12.5 18L19 11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">Todo</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'dashboard' %}" class="nav-item">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="2" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+          <rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+          <rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+          <rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+        </svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="{% url 'calendar' %}" class="nav-item active">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="2.5" y="3.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M2.5 7H15.5M6 2V5M12 2V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span class="nav-label">Calendar</span>
+      </a>
+
+      <div class="nav-section-title">Projects</div>
+      {% for project in projects %}
+      <a href="{% url 'project_detail' project.pk %}" class="nav-item">
+        <span class="list-icon" style="background: hsl({{ project.pk|add:0 }}{% widthratio project.pk 1 40 %}, 55%, 55%);"></span>
+        <span class="nav-label">{{ project.name }}</span>
+        <span class="list-count">{{ project.task_count }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="footer-btn" id="themeToggle" title="Toggle theme">
+        <svg class="sun-icon" width="17" height="17" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="4" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M9 1V3M9 15V17M1 9H3M15 9H17M3.5 3.5L5 5M13 13L14.5 14.5M14.5 3.5L13 5M5 13L3.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="moon-icon" width="17" height="17" viewBox="0 0 18 18" fill="none">
+          <path d="M15.5 10.5A7 7 0 017.5 2.5 7 7 0 1015.5 10.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <form method="post" action="{% url 'logout' %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="footer-btn" title="Sign out">
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+            <path d="M6 15H3V3H6M12 6L15 9L12 12M7 9H15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <button class="mobile-menu-btn" id="mobileMenuBtn">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <path d="M3 6H19M3 11H19M3 16H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <main class="main">
+    <div class="main-inner main-wide">
+      <header class="main-header">
+        <div class="header-left">
+          <h1 class="page-title">Calendar</h1>
+          <span class="page-subtitle">{{ month_name }} {{ year }}</span>
+        </div>
+      </header>
+
+      <!-- Month stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-card-value">{{ month_total }}</span>
+          <span class="stat-card-label">This Month</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-value">{{ month_done }}</span>
+          <span class="stat-card-label">Completed</span>
+        </div>
+        <div class="stat-card {% if month_overdue > 0 %}stat-card-danger{% endif %}">
+          <span class="stat-card-value">{{ month_overdue }}</span>
+          <span class="stat-card-label">Overdue</span>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="calendar-wrap">
+        <div class="calendar-nav">
+          <a class="cal-nav-btn" href="?year={{ prev_year }}&month={{ prev_month_num }}" aria-label="Previous month">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <span class="cal-month-title">{{ month_name }}, {{ year }}</span>
+          <a class="cal-nav-btn" href="?year={{ next_year }}&month={{ next_month_num }}" aria-label="Next month">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <div class="calendar-grid">
+          {% for label in weekday_labels %}
+          <div class="cal-weekday">{{ label }}</div>
+          {% endfor %}
+
+          {% for week in weeks %}
+            {% for cell in week %}
+            <a class="cal-day{% if not cell.in_month %} cal-day--muted{% endif %}{% if cell.is_today %} cal-day--today{% endif %}{% if cell.is_selected %} cal-day--selected{% endif %}"
+               href="?year={{ year }}&month={{ month }}&day={{ cell.date.day }}">
+              <span class="cal-day-num">{{ cell.date.day }}</span>
+              {% if cell.dots %}
+              <span class="cal-dots">
+                {% for color in cell.dots %}<span class="cal-dot" style="background: {{ color }}"></span>{% endfor %}
+              </span>
+              {% endif %}
+            </a>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Day tasks -->
+      {% if selected_date %}
+      <h2 class="section-title" style="margin-top:24px">{{ selected_date|date:"l, F j" }}</h2>
+      {% if selected_tasks %}
+      <div class="overdue-list">
+        {% for task in selected_tasks %}
+        <a href="{% url 'project_detail' task.project.pk %}" class="overdue-item" style="border-left-color: var(--accent)">
+          <div class="overdue-main">
+            <span class="overdue-task-title">{% if task.status == 'done' %}<s>{{ task.title }}</s>{% else %}{{ task.title }}{% endif %}</span>
+            <span class="overdue-project">{{ task.project.name }} · {{ task.get_status_display }}</span>
+          </div>
+          <span class="overdue-due">{{ task.get_priority_display }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="empty-subtext" style="margin-top:8px">No tasks on this day.</p>
+      {% endif %}
+      {% endif %}
+    </div>
+  </main>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+{% endblock %}

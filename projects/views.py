@@ -1,5 +1,7 @@
+import calendar as py_calendar
 import json
-from datetime import date
+from collections import defaultdict
+from datetime import date, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -29,6 +31,100 @@ def dashboard(request):
         'overdue_tasks': overdue_tasks,
         'overdue_list': overdue_list,
         'in_progress': in_progress,
+    })
+
+
+PROJECT_COLORS = ['#c96442', '#e09b3d', '#5cb87a', '#4a8fd9', '#9b6cd4', '#d4616e', '#3dbab0']
+
+
+@login_required
+def calendar_view(request):
+    try:
+        year = int(request.GET.get('year', date.today().year))
+        month = int(request.GET.get('month', date.today().month))
+    except (TypeError, ValueError):
+        today = date.today()
+        year, month = today.year, today.month
+
+    if month < 1 or month > 12:
+        today = date.today()
+        year, month = today.year, today.month
+
+    selected_day = request.GET.get('day')
+    try:
+        selected_date = date(year, month, int(selected_day)) if selected_day else None
+    except (TypeError, ValueError):
+        selected_date = None
+
+    first_day = date(year, month, 1)
+    last_day = date(year, month, py_calendar.monthrange(year, month)[1])
+
+    tasks_in_month = Task.objects.filter(
+        project__owner=request.user,
+        due_date__gte=first_day,
+        due_date__lte=last_day,
+    ).select_related('project')
+
+    by_day = defaultdict(list)
+    for t in tasks_in_month:
+        by_day[t.due_date.day].append(t)
+
+    cal = py_calendar.Calendar(firstweekday=6)
+    weeks = []
+    for week in cal.monthdatescalendar(year, month):
+        row = []
+        for d in week:
+            in_month = d.month == month
+            day_tasks = by_day.get(d.day, []) if in_month else []
+            dots = []
+            seen_projects = set()
+            for t in day_tasks:
+                if t.project_id in seen_projects:
+                    continue
+                seen_projects.add(t.project_id)
+                dots.append(PROJECT_COLORS[t.project_id % len(PROJECT_COLORS)])
+                if len(dots) >= 5:
+                    break
+            row.append({
+                'date': d,
+                'in_month': in_month,
+                'is_today': d == date.today(),
+                'is_selected': selected_date is not None and d == selected_date,
+                'task_count': len(day_tasks),
+                'dots': dots,
+            })
+        weeks.append(row)
+
+    selected_tasks = []
+    if selected_date:
+        selected_tasks = Task.objects.filter(
+            project__owner=request.user,
+            due_date=selected_date,
+        ).select_related('project').order_by('priority', 'position')
+
+    month_total = tasks_in_month.count()
+    month_done = tasks_in_month.filter(status='done').count()
+    month_overdue = tasks_in_month.filter(due_date__lt=date.today()).exclude(status='done').count()
+
+    prev_month = (first_day - timedelta(days=1)).replace(day=1)
+    next_month_start = (last_day + timedelta(days=1))
+
+    return render(request, 'projects/calendar.html', {
+        'year': year,
+        'month': month,
+        'month_name': py_calendar.month_name[month],
+        'weeks': weeks,
+        'weekday_labels': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        'prev_year': prev_month.year,
+        'prev_month_num': prev_month.month,
+        'next_year': next_month_start.year,
+        'next_month_num': next_month_start.month,
+        'selected_date': selected_date,
+        'selected_tasks': selected_tasks,
+        'month_total': month_total,
+        'month_done': month_done,
+        'month_overdue': month_overdue,
+        'projects': Project.objects.filter(owner=request.user),
     })
 
 
