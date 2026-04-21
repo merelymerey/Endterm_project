@@ -156,12 +156,22 @@ input, textarea, select { font-family: inherit; }
   flex-shrink: 0;
 }
 
+.list-folder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+}
+
 .list-count {
   font-size: 0.73rem;
   color: var(--text-tertiary);
   background: var(--surface-active);
-  padding: 1px 7px;
+  padding: 2px 9px;
   border-radius: 10px;
+  font-weight: 500;
 }
 
 /* Sidebar Stats */
