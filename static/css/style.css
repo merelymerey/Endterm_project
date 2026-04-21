@@ -425,6 +425,17 @@ input, textarea, select { font-family: inherit; }
   border: none !important;
 }
 
+.project-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-right: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40%;
+}
+
 .projects-grid .progress-bar-sm {
   background: var(--border-light) !important;
   height: 4px;

@@ -141,6 +141,7 @@
             <p class="project-card-desc">{{ project.description|truncatechars:80 }}</p>
             {% endif %}
             <div class="project-card-footer">
+              <span class="project-card-title">{{ project.name }}</span>
               <span class="project-card-stat">{{ project.task_count }} task{{ project.task_count|pluralize }}</span>
               <div class="progress-bar-sm">
                 <div class="progress-fill-sm" style="width: {{ project.progress }}%"></div>
