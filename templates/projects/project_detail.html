@@ -263,7 +263,7 @@
 
       <!-- Delete project -->
       <div class="danger-zone">
-        <form method="post" action="{% url 'project_delete' project.pk %}" onsubmit="return confirm('Delete this project and all its tasks?')">
+        <form method="post" action="{% url 'project_delete' project.pk %}" data-confirm="Delete this project and all its tasks?" data-confirm-title="Delete project?">
           {% csrf_token %}
           <button type="submit" class="btn btn-danger btn-sm">Delete Project</button>
         </form>

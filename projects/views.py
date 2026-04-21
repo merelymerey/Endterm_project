@@ -14,10 +14,12 @@ def dashboard(request):
     projects = Project.objects.filter(owner=request.user)
     total_tasks = Task.objects.filter(project__owner=request.user).count()
     completed_tasks = Task.objects.filter(project__owner=request.user, status='done').count()
-    overdue_tasks = Task.objects.filter(
+    overdue_qs = Task.objects.filter(
         project__owner=request.user,
         due_date__lt=date.today(),
-    ).exclude(status='done').count()
+    ).exclude(status='done').select_related('project').order_by('due_date')
+    overdue_tasks = overdue_qs.count()
+    overdue_list = overdue_qs[:10]
     in_progress = Task.objects.filter(project__owner=request.user, status='in_progress').count()
 
     return render(request, 'projects/dashboard.html', {
@@ -25,6 +27,7 @@ def dashboard(request):
         'total_tasks': total_tasks,
         'completed_tasks': completed_tasks,
         'overdue_tasks': overdue_tasks,
+        'overdue_list': overdue_list,
         'in_progress': in_progress,
     })
 

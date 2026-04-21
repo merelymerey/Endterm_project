@@ -123,28 +123,25 @@
       <h2 class="section-title">Your Projects</h2>
       <div class="projects-grid">
         {% for project in projects %}
-        <a href="{% url 'project_detail' project.pk %}" class="project-card">
-          <div class="project-card-header">
-            <h3 class="project-card-name">{{ project.name }}</h3>
-            <div class="project-card-actions">
-              <a href="{% url 'project_edit' project.pk %}" class="icon-btn-sm" title="Edit" onclick="event.stopPropagation();">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                  <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
-                </svg>
-              </a>
+        <div class="project-card">
+          <a href="{% url 'project_edit' project.pk %}" class="project-card-edit icon-btn-sm" title="Edit">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M11.5 2.5L13.5 4.5L5 13H3V11L11.5 2.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a href="{% url 'project_detail' project.pk %}" class="project-card-link">
+            {% if project.description %}
+            <p class="project-card-desc">{{ project.description|truncatechars:80 }}</p>
+            {% endif %}
+            <div class="project-card-footer">
+              <span class="project-card-stat">{{ project.task_count }} task{{ project.task_count|pluralize }}</span>
+              <div class="progress-bar-sm">
+                <div class="progress-fill-sm" style="width: {{ project.progress }}%"></div>
+              </div>
+              <span class="project-card-stat">{{ project.progress }}%</span>
             </div>
-          </div>
-          {% if project.description %}
-          <p class="project-card-desc">{{ project.description|truncatechars:80 }}</p>
-          {% endif %}
-          <div class="project-card-footer">
-            <span class="project-card-stat">{{ project.task_count }} task{{ project.task_count|pluralize }}</span>
-            <div class="progress-bar-sm">
-              <div class="progress-fill-sm" style="width: {{ project.progress }}%"></div>
-            </div>
-            <span class="project-card-stat">{{ project.progress }}%</span>
-          </div>
-        </a>
+          </a>
+        </div>
         {% endfor %}
       </div>
       {% else %}
@@ -158,6 +155,21 @@
         <p class="empty-text">No projects yet</p>
         <p class="empty-subtext">Create your first project to get started</p>
         <a href="{% url 'project_create' %}" class="btn btn-primary" style="margin-top:16px">Create Project</a>
+      </div>
+      {% endif %}
+
+      {% if overdue_list %}
+      <h2 class="section-title overdue-title">Overdue Tasks <span class="overdue-badge">{{ overdue_tasks }}</span></h2>
+      <div class="overdue-list">
+        {% for task in overdue_list %}
+        <a href="{% url 'project_detail' task.project.pk %}" class="overdue-item">
+          <div class="overdue-main">
+            <span class="overdue-task-title">{{ task.title }}</span>
+            <span class="overdue-project">{{ task.project.name }}</span>
+          </div>
+          <span class="overdue-due">Due {{ task.due_date|date:"M j" }}</span>
+        </a>
+        {% endfor %}
       </div>
       {% endif %}
     </div>

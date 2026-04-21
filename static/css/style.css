@@ -417,20 +417,39 @@ input, textarea, select { font-family: inherit; }
   gap: 12px;
 }
 
-.project-card {
-  display: block;
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 18px;
-  transition: all var(--transition);
+.projects-grid,
+.projects-grid *,
+.projects-grid *:hover {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
-.project-card:hover {
-  border-color: var(--border);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+.projects-grid .progress-bar-sm {
+  background: var(--border-light) !important;
+  height: 4px;
 }
+.projects-grid .progress-fill-sm {
+  background: var(--accent) !important;
+}
+
+.project-card-link {
+  display: block;
+  padding: 18px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-card-edit {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0;
+  transition: opacity var(--transition);
+  z-index: 1;
+}
+
+.project-card:hover .project-card-edit { opacity: 1; }
 
 .project-card-header {
   display: flex;
@@ -487,6 +506,124 @@ input, textarea, select { font-family: inherit; }
   background: var(--accent);
   border-radius: 4px;
   transition: width 0.4s ease;
+}
+
+/* ========== Confirm Modal ========== */
+.confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.confirm-modal.open { display: flex; }
+.confirm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.15s ease;
+}
+.confirm-dialog {
+  position: relative;
+  width: 90%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 22px 22px 18px;
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.confirm-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.confirm-message {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ========== Overdue Tasks ========== */
+.overdue-title {
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.overdue-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 11px;
+  background: var(--danger);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.overdue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.overdue-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition);
+}
+.overdue-item:hover {
+  border-color: var(--danger);
+  box-shadow: var(--shadow-sm);
+}
+.overdue-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.overdue-task-title {
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.overdue-project {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+.overdue-due {
+  font-size: 0.8rem;
+  color: var(--danger);
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* ========== Toolbar ========== */

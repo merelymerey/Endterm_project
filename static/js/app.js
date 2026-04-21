@@ -1,3 +1,57 @@
+// ========== Custom Confirm Modal ==========
+function customConfirm(message, title = 'Are you sure?') {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('confirmModal');
+    const msgEl = document.getElementById('confirmMessage');
+    const titleEl = document.getElementById('confirmTitle');
+    const okBtn = document.getElementById('confirmOk');
+    const cancelBtn = document.getElementById('confirmCancel');
+    if (!modal || !msgEl || !okBtn || !cancelBtn) {
+      resolve(window.confirm(message));
+      return;
+    }
+    msgEl.textContent = message;
+    if (titleEl) titleEl.textContent = title;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+
+    const cleanup = (result) => {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      modal.removeEventListener('click', onBackdrop);
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    };
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+    const onBackdrop = (e) => { if (e.target.classList.contains('confirm-backdrop')) cleanup(false); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') cleanup(false);
+      if (e.key === 'Enter') cleanup(true);
+    };
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    modal.addEventListener('click', onBackdrop);
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => okBtn.focus(), 50);
+  });
+}
+
+document.querySelectorAll('form[data-confirm]').forEach((form) => {
+  form.addEventListener('submit', async (e) => {
+    if (form.dataset.confirmed === '1') return;
+    e.preventDefault();
+    const ok = await customConfirm(form.dataset.confirm, form.dataset.confirmTitle || 'Are you sure?');
+    if (ok) {
+      form.dataset.confirmed = '1';
+      form.submit();
+    }
+  });
+});
+
 // ========== Theme Toggle ==========
 const themeToggle = document.getElementById('themeToggle');
 if (themeToggle) {
@@ -111,7 +165,7 @@ document.querySelectorAll('.task-status-toggle').forEach(toggle => {
 
 // ========== Delete Task (AJAX) ==========
 async function deleteTask(projectId, taskId, btn) {
-  if (!confirm('Delete this task?')) return;
+  if (!(await customConfirm('Delete this task?', 'Delete task?'))) return;
 
   const row = btn.closest('[data-task-id]');
 

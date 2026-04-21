@@ -1,6 +1,6 @@
 
 
-onst STORAGE_KEY = 'claude-todo';
+const STORAGE_KEY = 'claude-todo';
 const LIST_COLORS = ['#c96442', '#e09b3d', '#5cb87a', '#4a8fd9', '#9b6cd4', '#d4616e', '#3dbab0'];
 const PRIORITY_MAP = { none: 0, low: 1, medium: 2, high: 3 };
 const PRIORITY_COLORS = { high: '#d64545', medium: '#e09b3d', low: '#4a9e6e', none: '#9c9488' };
